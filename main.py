@@ -34,7 +34,8 @@ def work(board, population, fn, x, y):
     fit_pop = []
 
     for p in range(len(population)):
-        wboard = board
+        wboard = np.zeros((len(board), len(board)), dtype=int)
+        wboard += board
         i = x
         j = y
         eat = 0
@@ -58,9 +59,37 @@ def work(board, population, fn, x, y):
             t += 1
         print(wboard)
         print(eat)
-        fit_pop.append((eat * eat) / t)
+        fit_pop.append((eat * eat) / t)  # fitness function
     return population, fit_pop
 
+
+def calculate_fit(fit_pop):  # covert result functions result to percentiles
+    per_fit = []
+    for i in range(len(fit_pop)):
+        per_fit.append(fit_pop[i] / sum(fit_pop))
+    return per_fit
+
+
+def selection(population, per_fit):
+    calculation_fit = [0]  # it is created for calculate random
+    selected_pop_ind = []
+    A = np.zeros((len(population), len(population)), dtype=int)
+    for i in range(len(per_fit) - 1):
+        calculation_fit.append(sum(per_fit[0:i + 1]))
+    calculation_fit.append(1)  # sometimes this value can be 0,99999
+
+    print(calculation_fit)
+
+    for j in range(len(per_fit)):
+        select = random.random()
+        print(select)
+        for i in range(len(per_fit)):
+            if select > calculation_fit[i] and select < calculation_fit[i + 1]:
+                selected_pop_ind.append(i)
+        #A = np.vstack([A, population[selected_pop_ind[j]]])
+        print(population[selected_pop_ind[j]])
+    print(selected_pop_ind)
+    #print(new_pop)
 
 n = 5  # size of board
 fn = 10  # number of food
@@ -77,8 +106,10 @@ board[x][y] = 8
 
 # print(population)
 # print(board)
-for i in range(0,10):
-    print("giriş")
+for i in range(0, 10):
+    print(i, ". nesil")
     print(board)
     population, fit_pop = work(board, population, fn, x, y)
-    print(fit_pop)
+    print("normal", fit_pop)
+    print("yüzdelik", calculate_fit(fit_pop))
+    selection(population, calculate_fit(fit_pop))
