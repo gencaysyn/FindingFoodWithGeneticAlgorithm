@@ -40,7 +40,7 @@ def work(board, population, fn, x, y):
         j = y
         eat = 0
         t = 0  # distance
-        #print("Person...........")
+        # print("Person...........")
         while eat != fn and t < len(population[0]):
             if population[p][t] == 1:
                 j -= 1
@@ -51,16 +51,16 @@ def work(board, population, fn, x, y):
             elif population[p][t] == 4:
                 i += 1
             if i < 0 or j < 0 or i >= len(wboard) or j >= len(wboard):
-                #print("hit to wall!")
+                # print("hit to wall!")
                 break
             if wboard[i][j] == 1:
                 eat += 1
             wboard[i][j] = 8
             t += 1
-        #print(wboard)
-        #print(eat)
-        #fit_pop.append((eat * eat) / t)  # fitness function
-        fit_pop.append(eat/fn)
+        # print(wboard)
+        # print(eat)
+        # fit_pop.append((eat * eat) / t)  # fitness function
+        fit_pop.append(eat / fn)
     return population, fit_pop
 
 
@@ -91,7 +91,7 @@ def selection(population, per_fit):
                 selected_pop_ind.append(i)
         new_pop = np.delete(new_pop, 0, 0)
         new_pop = np.append(new_pop, np.array([population[selected_pop_ind[j]]]), axis=0)
-    #print("Selected Generation:\n", new_pop)
+    # print("Selected Generation:\n", new_pop)
     return new_pop
 
 
@@ -103,7 +103,7 @@ def cross_over(population, c):
         else:
             for j in range(len(population[0]) - 1, c, -1):
                 population[i][j], population[i + 1][j] = population[i + 1][j], population[i][j]
-    #print("Crossed Population:\n", population)
+    # print("Crossed Population:\n", population)
     return population
 
 
@@ -113,7 +113,7 @@ def mutation(population, m):
             rand_s = random.randint(1, 4)
             rand_j = random.randint(0, len(population[0]) - 1)
             population[i][rand_j] = rand_s
-    #print("Mutated Population:\n", population)
+    # print("Mutated Population:\n", population)
     return population
 
 
@@ -139,18 +139,18 @@ print("Board:\n", board)
 counter = 0
 while True:
     population, fit_pop = work(board, population, fn, x, y)
-    #print("population:\n", population)
-    #print("normal", fit_pop)
+    # print("population:\n", population)
+    # print("normal", fit_pop)
     counter += 1
     print(counter)
     if 1 in fit_pop:
         print("Foud it!")
         break
-    #print("yüzdelik", calculate_fit(fit_pop))
+    # print("yüzdelik", calculate_fit(fit_pop))
     population = selection(population, calculate_fit(fit_pop))
     population = cross_over(population, c)
     population = mutation(population, m)
     print()
 print("Board:\n", board)
-print("Finding Way:",population[fit_pop.index(1)])
-print("counter=",counter)
+print("Finding Way:", population[fit_pop.index(1)])
+print("counter=", counter)
