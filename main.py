@@ -40,7 +40,7 @@ def work(board, population, fn, x, y):
         j = y
         eat = 0
         t = 0  # distance
-        print("Person...........")
+        #print("Person...........")
         while eat != fn and t < len(population[0]):
             if population[p][t] == 1:
                 j -= 1
@@ -51,65 +51,106 @@ def work(board, population, fn, x, y):
             elif population[p][t] == 4:
                 i += 1
             if i < 0 or j < 0 or i >= len(wboard) or j >= len(wboard):
-                print("hit to wall!")
+                #print("hit to wall!")
                 break
             if wboard[i][j] == 1:
                 eat += 1
             wboard[i][j] = 8
             t += 1
-        print(wboard)
-        print(eat)
-        fit_pop.append((eat * eat) / t)  # fitness function
+        #print(wboard)
+        #print(eat)
+        #fit_pop.append((eat * eat) / t)  # fitness function
+        fit_pop.append(eat/fn)
     return population, fit_pop
 
 
 def calculate_fit(fit_pop):  # covert result functions result to percentiles
     per_fit = []
     for i in range(len(fit_pop)):
-        per_fit.append(fit_pop[i] / sum(fit_pop))
+        if sum(fit_pop) != 0:
+            per_fit.append(fit_pop[i] / sum(fit_pop))
+        else:
+            per_fit.append(0)
     return per_fit
 
 
 def selection(population, per_fit):
     calculation_fit = [0]  # it is created for calculate random
     selected_pop_ind = []
-    A = np.zeros((len(population), len(population)), dtype=int)
+    new_pop = np.zeros((len(population), len(population[0])), dtype=int)
     for i in range(len(per_fit) - 1):
         calculation_fit.append(sum(per_fit[0:i + 1]))
     calculation_fit.append(1)  # sometimes this value can be 0,99999
 
-    print(calculation_fit)
+    # print(calculation_fit)
 
     for j in range(len(per_fit)):
         select = random.random()
-        print(select)
         for i in range(len(per_fit)):
             if select > calculation_fit[i] and select < calculation_fit[i + 1]:
                 selected_pop_ind.append(i)
-        #A = np.vstack([A, population[selected_pop_ind[j]]])
-        print(population[selected_pop_ind[j]])
-    print(selected_pop_ind)
-    #print(new_pop)
+        new_pop = np.delete(new_pop, 0, 0)
+        new_pop = np.append(new_pop, np.array([population[selected_pop_ind[j]]]), axis=0)
+    #print("Selected Generation:\n", new_pop)
+    return new_pop
+
+
+def cross_over(population, c):
+    for i in range(0, len(population) - 1, 2):
+        if (i / 2) % 2 == 0:
+            for j in range(c):
+                population[i][j], population[i + 1][j] = population[i + 1][j], population[i][j]
+        else:
+            for j in range(len(population[0]) - 1, c, -1):
+                population[i][j], population[i + 1][j] = population[i + 1][j], population[i][j]
+    #print("Crossed Population:\n", population)
+    return population
+
+
+def mutation(population, m):
+    for i in range(len(population)):
+        for j in range(m):
+            rand_s = random.randint(1, 4)
+            rand_j = random.randint(0, len(population[0]) - 1)
+            population[i][rand_j] = rand_s
+    #print("Mutated Population:\n", population)
+    return population
+
 
 n = 5  # size of board
 fn = 10  # number of food
-m = 10  # number of step
-p = 4  # population
+s = 15  # number of step
+p = 8  # population
+c = 1  # cutting point
+m = 1  # mutation rate
 # start point indexes
 x = 2
 y = 2
 board = np.zeros((n, n), dtype=int)
 foods = generate_food(n, fn, x, y)
 board = place_foods(board, foods)
-population = np.random.random_integers(4, size=(p, m))
+population = np.random.random_integers(4, size=(p, s))
 board[x][y] = 8
 
 # print(population)
 # print(board)
-for i in range(0, 10):
-    print(i, ". nesil")
-    print(board)
+
+print("Board:\n", board)
+counter = 0
+while True:
     population, fit_pop = work(board, population, fn, x, y)
-    print("normal", fit_pop)
-    print("yüzdelik", calculate_fit(fit_pop))
-    selection(population, calculate_fit(fit_pop))
+    #print("population:\n", population)
+    #print("normal", fit_pop)
+    counter += 1
+    print(counter)
+    if 1 in fit_pop:
+        print("Foud it!")
+        break
+    #print("yüzdelik", calculate_fit(fit_pop))
+    population = selection(population, calculate_fit(fit_pop))
+    population = cross_over(population, c)
+    population = mutation(population, m)
+    print()
+print("Board:\n", board)
+print("Finding Way:",population[fit_pop.index(1)])
+print("counter=",counter)
