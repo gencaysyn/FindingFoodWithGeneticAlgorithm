@@ -19,7 +19,7 @@ def generate_food(n, fn, a, b):
             if x == a and y == b:
                 flag = 1
             for f in foods:
-                if (x == f.x and y == f.y):
+                if x == f.x and y == f.y:
                     flag = 1
             if flag == 0:
                 break
@@ -29,7 +29,7 @@ def generate_food(n, fn, a, b):
 
 def place_foods(board, foods):
     for food in foods:
-        board[food.x][food.y] = 1
+        board[food.x][food.y] = 1  # Food color
     return board
 
 
@@ -59,7 +59,7 @@ def work(board, population, fn, x, y):
             if i < 0 or j < 0 or i >= len(wboard) or j >= len(wboard):
                 # print("hit to wall!")
                 break
-            if wboard[i][j] == 1:
+            if wboard[i][j] == 1:  # Food color
                 eat += 1
             wboard[old_i][old_j] = 8
             wboard[i][j] = 15
