@@ -16,8 +16,10 @@ def generate_food(n, fn, a, b):
             flag = 0
             x = random.randint(0, n - 1)
             y = random.randint(0, n - 1)
+            if x == a and y == b:
+                flag = 1
             for f in foods:
-                if (x == f.x and y == f.y) or (x == a and y == b):
+                if (x == f.x and y == f.y):
                     flag = 1
             if flag == 0:
                 break
@@ -40,10 +42,9 @@ def work(board, population, fn, x, y):
         j = y
         eat = 0
         t = 0  # distance
-        # print("Person...........")
         plt.cla()
         plt.imshow(wboard)
-        plt.pause(0.0001)
+        plt.pause(0.0000001)
         while eat != fn and t < len(population[0]):
             old_i = i
             old_j = j
@@ -65,23 +66,23 @@ def work(board, population, fn, x, y):
             t += 1
             plt.cla()
             plt.imshow(wboard)
-            plt.pause(0.000001)
+            plt.pause(0.00000001)
             if eat == fn:
                 break
         fit_pop.append(eat / fn)
         if eat == fn:
             break
-        #plt.matshow(wboard)
-        #plt.show()
+        # plt.matshow(wboard)
+        # plt.show()
         # print(wboard)
         # print(eat)
         # fit_pop.append((eat * eat) / t)  # fitness function
     return population, fit_pop
 
+
 def show_board(board):
     plt.imshow(board)
     plt.pause(0.001)
-
 
 
 def calculate_fit(fit_pop):  # covert result functions result to percentiles
@@ -140,10 +141,10 @@ def mutation(population, m, mrate):
     return population
 
 
-n = 5  # size of board
-fn = 2  # number of food
+n = 3  # size of board
+fn = 6  # number of food
 s = 12  # number of step
-p = 8  # population
+p = 4  # population
 c = 4  # cutting point
 m = 1  # mutation size
 mrate = 50  # mutation rate percent
@@ -153,7 +154,7 @@ y = 2
 board = np.zeros((n, n), dtype=int)
 foods = generate_food(n, fn, x, y)
 board = place_foods(board, foods)
-population = np.random.randint(1,5, size=(p, s))
+population = np.random.randint(1, 5, size=(p, s))
 board[x][y] = 8
 
 # print(population)
@@ -167,8 +168,9 @@ while True:
     # print("normal", fit_pop)
     counter += 1
     print(counter)
+    print(fit_pop)
     if 1 in fit_pop:
-        print("Foud it!")
+        print("Found it!")
         break
     # print("yüzdelik", calculate_fit(fit_pop))
     population = selection(population, calculate_fit(fit_pop))
