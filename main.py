@@ -65,7 +65,7 @@ def work(board, population, fn, x, y):
             t += 1
             plt.cla()
             plt.imshow(wboard)
-            plt.pause(0.0001)
+            plt.pause(0.000001)
             if eat == fn:
                 break
         fit_pop.append(eat / fn)
@@ -140,7 +140,7 @@ def mutation(population, m, mrate):
     return population
 
 
-n = 4  # size of board
+n = 5  # size of board
 fn = 2  # number of food
 s = 12  # number of step
 p = 8  # population
@@ -153,7 +153,7 @@ y = 2
 board = np.zeros((n, n), dtype=int)
 foods = generate_food(n, fn, x, y)
 board = place_foods(board, foods)
-population = np.random.randint(4, size=(p, s))
+population = np.random.randint(1,5, size=(p, s))
 board[x][y] = 8
 
 # print(population)
