@@ -1,5 +1,6 @@
 import random
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class Food:
@@ -32,7 +33,6 @@ def place_foods(board, foods):
 
 def work(board, population, fn, x, y):
     fit_pop = []
-
     for p in range(len(population)):
         wboard = np.zeros((len(board), len(board)), dtype=int)
         wboard += board
@@ -41,7 +41,12 @@ def work(board, population, fn, x, y):
         eat = 0
         t = 0  # distance
         # print("Person...........")
+        plt.cla()
+        plt.imshow(wboard)
+        plt.pause(0.0001)
         while eat != fn and t < len(population[0]):
+            old_i = i
+            old_j = j
             if population[p][t] == 1:
                 j -= 1
             elif population[p][t] == 2:
@@ -55,13 +60,28 @@ def work(board, population, fn, x, y):
                 break
             if wboard[i][j] == 1:
                 eat += 1
-            wboard[i][j] = 8
+            wboard[old_i][old_j] = 8
+            wboard[i][j] = 15
             t += 1
+            plt.cla()
+            plt.imshow(wboard)
+            plt.pause(0.0001)
+            if eat == fn:
+                break
+        fit_pop.append(eat / fn)
+        if eat == fn:
+            break
+        #plt.matshow(wboard)
+        #plt.show()
         # print(wboard)
         # print(eat)
         # fit_pop.append((eat * eat) / t)  # fitness function
-        fit_pop.append(eat / fn)
     return population, fit_pop
+
+def show_board(board):
+    plt.imshow(board)
+    plt.pause(0.001)
+
 
 
 def calculate_fit(fit_pop):  # covert result functions result to percentiles
@@ -107,29 +127,33 @@ def cross_over(population, c):
     return population
 
 
-def mutation(population, m):
+def mutation(population, m, mrate):
+    mrate = mrate / 100
     for i in range(len(population)):
-        for j in range(m):
-            rand_s = random.randint(1, 4)
-            rand_j = random.randint(0, len(population[0]) - 1)
-            population[i][rand_j] = rand_s
+        select = random.random()
+        if select < mrate:
+            for j in range(m):
+                rand_s = random.randint(1, 4)
+                rand_j = random.randint(0, len(population[0]) - 1)
+                population[i][rand_j] = rand_s
     # print("Mutated Population:\n", population)
     return population
 
 
-n = 5  # size of board
-fn = 10  # number of food
-s = 15  # number of step
+n = 4  # size of board
+fn = 2  # number of food
+s = 12  # number of step
 p = 8  # population
-c = 1  # cutting point
-m = 1  # mutation rate
+c = 4  # cutting point
+m = 1  # mutation size
+mrate = 50  # mutation rate percent
 # start point indexes
 x = 2
 y = 2
 board = np.zeros((n, n), dtype=int)
 foods = generate_food(n, fn, x, y)
 board = place_foods(board, foods)
-population = np.random.random_integers(4, size=(p, s))
+population = np.random.randint(4, size=(p, s))
 board[x][y] = 8
 
 # print(population)
@@ -149,8 +173,9 @@ while True:
     # print("yüzdelik", calculate_fit(fit_pop))
     population = selection(population, calculate_fit(fit_pop))
     population = cross_over(population, c)
-    population = mutation(population, m)
+    population = mutation(population, m, mrate)
     print()
 print("Board:\n", board)
 print("Finding Way:", population[fit_pop.index(1)])
-print("counter=", counter)
+print("Counter=", counter)
+plt.show()
