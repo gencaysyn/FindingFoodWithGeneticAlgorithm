@@ -1,4 +1,2 @@
 # FindingFoodWithGeneticAlgorithm
-install python 3/n
-install numpy/n
-install matplotlib/n
+require python 3, numpy and matplotlib 
