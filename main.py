@@ -29,7 +29,7 @@ def generate_food(n, fn, a, b):
 
 def place_foods(board, foods):
     for food in foods:
-        board[food.x][food.y] = 1  # Food color
+        board[food.x][food.y] = 4  # Food color
     return board
 
 
@@ -42,9 +42,9 @@ def work(board, population, fn, x, y):
         j = y
         eat = 0
         t = 0  # distance
-        plt.cla()
-        plt.imshow(wboard)
-        plt.pause(0.0000001)
+        # plt.cla()
+        # plt.imshow(wboard)
+        # plt.pause(0.0000001)
         while eat != fn and t < len(population[0]):
             old_i = i
             old_j = j
@@ -59,7 +59,7 @@ def work(board, population, fn, x, y):
             if i < 0 or j < 0 or i >= len(wboard) or j >= len(wboard):
                 # print("hit to wall!")
                 break
-            if wboard[i][j] == 1:  # Food color
+            if wboard[i][j] == 4:  # Food color
                 eat += 1
             wboard[old_i][old_j] = 8
             wboard[i][j] = 15
@@ -141,13 +141,13 @@ def mutation(population, m, mrate):
     return population
 
 
-n = 3  # size of board
-fn = 6  # number of food
-s = 12  # number of step
-p = 4  # population
-c = 4  # cutting point
-m = 1  # mutation size
-mrate = 50  # mutation rate percent
+n = 6  # size of board
+fn = 3  # number of food
+s = 30  # number of step
+p = 6  # population
+c = 2  # cutting point
+m = 3  # mutation size
+mrate = 80  # mutation rate
 # start point indexes
 x = 2
 y = 2
@@ -162,12 +162,23 @@ board[x][y] = 8
 
 print("Board:\n", board)
 counter = 0
+print("Size of board {}x{}".format(n, n))
+print("Number of food:", fn)
+print("Number of step:", s)
+print("Population:", p)
+print("Cutting Point", c)
+print("Mutation size:", m)
+print("Mutation rate:", mrate)
+plt.imshow(board)
+plt.pause(2)
+
 while True:
+
     population, fit_pop = work(board, population, fn, x, y)
     # print("population:\n", population)
     # print("normal", fit_pop)
     counter += 1
-    print(counter)
+    print("Generation", counter)
     print(fit_pop)
     if 1 in fit_pop:
         print("Found it!")
@@ -179,5 +190,4 @@ while True:
     print()
 print("Board:\n", board)
 print("Finding Way:", population[fit_pop.index(1)])
-print("Counter=", counter)
 plt.show()
