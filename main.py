@@ -1,5 +1,6 @@
 import random
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class Food:
@@ -15,8 +16,10 @@ def generate_food(n, fn, a, b):
             flag = 0
             x = random.randint(0, n - 1)
             y = random.randint(0, n - 1)
+            if x == a and y == b:
+                flag = 1
             for f in foods:
-                if (x == f.x and y == f.y) or (x == a and y == b):
+                if x == f.x and y == f.y:
                     flag = 1
             if flag == 0:
                 break
@@ -26,13 +29,12 @@ def generate_food(n, fn, a, b):
 
 def place_foods(board, foods):
     for food in foods:
-        board[food.x][food.y] = 1
+        board[food.x][food.y] = 4  # Food color
     return board
 
 
 def work(board, population, fn, x, y):
     fit_pop = []
-
     for p in range(len(population)):
         wboard = np.zeros((len(board), len(board)), dtype=int)
         wboard += board
@@ -40,8 +42,12 @@ def work(board, population, fn, x, y):
         j = y
         eat = 0
         t = 0  # distance
-        # print("Person...........")
+        # plt.cla()
+        # plt.imshow(wboard)
+        # plt.pause(0.0000001)
         while eat != fn and t < len(population[0]):
+            old_i = i
+            old_j = j
             if population[p][t] == 1:
                 j -= 1
             elif population[p][t] == 2:
@@ -53,15 +59,30 @@ def work(board, population, fn, x, y):
             if i < 0 or j < 0 or i >= len(wboard) or j >= len(wboard):
                 # print("hit to wall!")
                 break
-            if wboard[i][j] == 1:
+            if wboard[i][j] == 4:  # Food color
                 eat += 1
-            wboard[i][j] = 8
+            wboard[old_i][old_j] = 8
+            wboard[i][j] = 15
             t += 1
+            plt.cla()
+            plt.imshow(wboard)
+            plt.pause(0.00000001)
+            if eat == fn:
+                break
+        fit_pop.append(eat / fn)
+        if eat == fn:
+            break
+        # plt.matshow(wboard)
+        # plt.show()
         # print(wboard)
         # print(eat)
         # fit_pop.append((eat * eat) / t)  # fitness function
-        fit_pop.append(eat / fn)
     return population, fit_pop
+
+
+def show_board(board):
+    plt.imshow(board)
+    plt.pause(0.001)
 
 
 def calculate_fit(fit_pop):  # covert result functions result to percentiles
@@ -107,29 +128,33 @@ def cross_over(population, c):
     return population
 
 
-def mutation(population, m):
+def mutation(population, m, mrate):
+    mrate = mrate / 100
     for i in range(len(population)):
-        for j in range(m):
-            rand_s = random.randint(1, 4)
-            rand_j = random.randint(0, len(population[0]) - 1)
-            population[i][rand_j] = rand_s
+        select = random.random()
+        if select < mrate:
+            for j in range(m):
+                rand_s = random.randint(1, 4)
+                rand_j = random.randint(0, len(population[0]) - 1)
+                population[i][rand_j] = rand_s
     # print("Mutated Population:\n", population)
     return population
 
 
-n = 5  # size of board
-fn = 10  # number of food
-s = 15  # number of step
-p = 8  # population
-c = 1  # cutting point
-m = 1  # mutation rate
+n = 6  # size of board
+fn = 3  # number of food
+s = 30  # number of step
+p = 6  # population
+c = 2  # cutting point
+m = 3  # mutation size
+mrate = 80  # mutation rate
 # start point indexes
 x = 2
 y = 2
 board = np.zeros((n, n), dtype=int)
 foods = generate_food(n, fn, x, y)
 board = place_foods(board, foods)
-population = np.random.random_integers(4, size=(p, s))
+population = np.random.randint(1, 5, size=(p, s))
 board[x][y] = 8
 
 # print(population)
@@ -137,20 +162,32 @@ board[x][y] = 8
 
 print("Board:\n", board)
 counter = 0
+print("Size of board {}x{}".format(n, n))
+print("Number of food:", fn)
+print("Number of step:", s)
+print("Population:", p)
+print("Cutting Point", c)
+print("Mutation size:", m)
+print("Mutation rate:", mrate)
+plt.imshow(board)
+plt.pause(2)
+
 while True:
+
     population, fit_pop = work(board, population, fn, x, y)
     # print("population:\n", population)
     # print("normal", fit_pop)
     counter += 1
-    print(counter)
+    print("Generation", counter)
+    print(fit_pop)
     if 1 in fit_pop:
-        print("Foud it!")
+        print("Found it!")
         break
     # print("yüzdelik", calculate_fit(fit_pop))
     population = selection(population, calculate_fit(fit_pop))
     population = cross_over(population, c)
-    population = mutation(population, m)
+    population = mutation(population, m, mrate)
     print()
 print("Board:\n", board)
 print("Finding Way:", population[fit_pop.index(1)])
-print("counter=", counter)
+plt.show()
