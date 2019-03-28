@@ -16,7 +16,7 @@ def generate_food(n, fn, a, b):
             flag = 0
             x = random.randint(0, n - 1)
             y = random.randint(0, n - 1)
-            if x == a and y == b:
+            if x == a and y == b:  # these controls are for the two foods not to overlap.
                 flag = 1
             for f in foods:
                 if x == f.x and y == f.y:
@@ -40,11 +40,8 @@ def work(board, population, fn, x, y):
         wboard += board
         i = x
         j = y
-        eat = 0
+        eat = 0  # number of eaten food
         t = 0  # distance
-        # plt.cla()
-        # plt.imshow(wboard)
-        # plt.pause(0.0000001)
         while eat != fn and t < len(population[0]):
             old_i = i
             old_j = j
@@ -56,8 +53,7 @@ def work(board, population, fn, x, y):
                 j += 1
             elif population[p][t] == 4:
                 i += 1
-            if i < 0 or j < 0 or i >= len(wboard) or j >= len(wboard):
-                # print("hit to wall!")
+            if i < 0 or j < 0 or i >= len(wboard) or j >= len(wboard):  # Hit to wall!
                 break
             if wboard[i][j] == 4:  # Food color
                 eat += 1
@@ -71,6 +67,7 @@ def work(board, population, fn, x, y):
                 break
         fit_pop.append(eat / fn)
         if eat == fn:
+            plt.imshow(wboard)
             break
         # plt.matshow(wboard)
         # plt.show()
@@ -141,9 +138,12 @@ def mutation(population, m, mrate):
     return population
 
 
-n = 6  # size of board
+###############################################
+# You can assign values ​​to all parameters here#
+###############################################
+n = 8  # size of board nxn
 fn = 3  # number of food
-s = 30  # number of step
+s = 40  # number of step
 p = 6  # population
 c = 2  # cutting point
 m = 3  # mutation size
@@ -172,22 +172,20 @@ print("Mutation rate:", mrate)
 plt.imshow(board)
 plt.pause(2)
 
-while True:
+while True:  # Main loop
 
     population, fit_pop = work(board, population, fn, x, y)
-    # print("population:\n", population)
-    # print("normal", fit_pop)
     counter += 1
     print("Generation", counter)
     print(fit_pop)
     if 1 in fit_pop:
         print("Found it!")
         break
-    # print("yüzdelik", calculate_fit(fit_pop))
     population = selection(population, calculate_fit(fit_pop))
     population = cross_over(population, c)
     population = mutation(population, m, mrate)
     print()
 print("Board:\n", board)
 print("Finding Way:", population[fit_pop.index(1)])
+
 plt.show()
