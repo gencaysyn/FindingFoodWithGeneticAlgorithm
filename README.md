@@ -1,8 +1,8 @@
 # Finding Food With Genetic Algorithm
-require 
-python 3, numpy
+###Requirements 
+python 3
 
-and 
+numpy
 
 matplotlib 
 #
